@@ -33,6 +33,7 @@ class GTNC(convert2mps.MachineLearning):
         if self.update_info['loops_learned'] == 0:
             self.calculate_cost_function()
             self.update_info['cost_function_loops'].append(self.update_info['cost_function'])
+            self.learning_rate()
             print('Initializing ... cost function = ' + str(self.update_info['cost_function']))
         if not self.update_info['is_converged']:
             print('start to learn to ' + str(learning_loops) + ' loops')
@@ -130,8 +131,14 @@ class GTNC(convert2mps.MachineLearning):
         self.update_info['is_converged'] = bool(
             ((cost_function_loops[loops_learned - 1] - cost_function_loops[loops_learned]) /
              abs(cost_function_loops[loops_learned - 1])) < self.para['converge_accuracy'])
-        if self.update_info['is_converged']:
-            if self.update_info['step'] > self.para['step_accuracy']:
-                self.update_info['step'] /= self.para['step_decay_rate']
-                print('update step reduces to ' + str(self.update_info['step']))
-                self.update_info['is_converged'] = False
+
+    # 调整学习率
+    def learning_rate(self):
+        self.update_info['step'] = self.para['update_step']
+        if 50 <= self.update_info['cost_function']:
+            self.update_info['step'] /= self.para['step_decay_rate']
+        elif 30 <= self.update_info['cost_function']:
+            self.update_info['step'] /= self.para['step_decay_rate']**2
+        elif 10 <= self.update_info['cost_function']:
+            self.update_info['step'] /= self.para['step_decay_rate']**3
+
