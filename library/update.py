@@ -123,7 +123,7 @@ class GTNC(convert2mps.MachineLearning):
             self.environment_zoom['right'][0, :].cpu() + np.log(abs(tmp_inner_product))) / self.data_info['n_training']
         # cost function和原来的公式差别不大，第一项是几乎为0，可以忽略，第二项是对每个类别加了一个常数(该类别中图片数量)，第三项是公式原本的东西。第二项去掉不去掉影响不大，准确率就差一点点
 
-    # 判断两次cost function的比率是否收敛，并且动态调整学习率
+    # 判断两次cost function的比率是否收敛
     def is_converge(self):
         loops_learned = self.update_info['loops_learned']
         cost_function_loops = self.update_info['cost_function_loops']
