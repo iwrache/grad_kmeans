@@ -10,8 +10,10 @@ labels_data = dict()
 data_tmp = torchvision.datasets.MNIST(root='./library', download=True, train=True)
 images_data['train'] = data_tmp.data.reshape(-1, 784)
 labels_data['train'] = data_tmp.targets
+data_tmp = torchvision.datasets.MNIST(root='./library', download=True, train=False)
 images_data['test'] = data_tmp.data.reshape(-1, 784)
 labels_data['test'] = data_tmp.targets
+del data_tmp
 # data
 data_size, dims, num_clusters = 60000, 784, 15
 
