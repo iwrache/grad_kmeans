@@ -26,7 +26,7 @@ class GTNC(convert2mps.MachineLearning):
 
 
     # 开始学习，计算一开始的cost function->一圈一圈学习知道收敛或者学习次数达到上限,这个函数只训练一个类
-    def start_learning(self, learning_loops=1):
+    def start_learning(self, learning_loops=3):
         self.prepare_start_learning()
         if self.update_info['is_converged'] == 'untrained':
             self.update_info['is_converged'] = False
@@ -85,7 +85,6 @@ class GTNC(convert2mps.MachineLearning):
         self.update_info['loops_learned'] += 1
 
     def update_mps_once(self): # cost function不是直接的NLL函数，前面还有个ln(Z')/ln(Z)，看原文就知道了
-        # 整个代码唯一没弄清楚的就是为什么在这里的grad要归一化， 原文伪代码倒是有这么一个p，但这里和原文中p好像不太一样?
         # Calculate gradient
         tmp_index1 = self.tensor_info['regular_center']
         tmp_tensor_current = self.tensor_data[tmp_index1]
