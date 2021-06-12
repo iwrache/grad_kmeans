@@ -24,8 +24,6 @@ class MachineLearning(MPSclass.MPS):
         self.update_info = dict()
         self.data_info = dict()
         self.tmp = {}
-        self.environment_left = tuple()
-        self.environment_right = tuple()
         self.environment_zoom = tuple()
 
 
