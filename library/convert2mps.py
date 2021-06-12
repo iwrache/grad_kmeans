@@ -75,8 +75,6 @@ class MachineLearning(MPSclass.MPS):
         self.tensor_info['cutoff'] = self.para['mps_cutoff']
         self.update_info['update_position'] = 0
 
-        self.data_info['n_training'] = self.tensor_input.shape[0]
-
     # 初始化环境
     def initialize_environment(self):
         self.environment_zoom['left'] = tc.zeros(
