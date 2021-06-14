@@ -24,16 +24,15 @@ class GTNC(convert2mps.MachineLearning):
         elif mode == 'end':
             print('This program ends at ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-
     # 开始学习，计算一开始的cost function->一圈一圈学习知道收敛或者学习次数达到上限,这个函数只训练一个类
     def start_learning(self, learning_loops=3):
+        self.print_program_info(mode='start')
         self.prepare_start_learning()
         if self.update_info['is_converged'] == 'untrained':
             self.update_info['is_converged'] = False
         if self.update_info['loops_learned'] == 0:
             self.calculate_cost_function()
             self.update_info['cost_function_loops'].append(self.update_info['cost_function'])
-            self.learning_rate()
             print('Initializing ... cost function = ' + str(self.update_info['cost_function']))
         if not self.update_info['is_converged']:
             print('start to learn to ' + str(learning_loops) + ' loops')
@@ -45,6 +44,7 @@ class GTNC(convert2mps.MachineLearning):
             self.print_converge_info()
         else:
             print('Training end, cost function = ' + str(self.update_info['cost_function']) + ', do not converge.')
+        self.print_program_info(mode='end')
         return self.tensor_data
 
     # 打印收敛的时候信息
@@ -85,6 +85,7 @@ class GTNC(convert2mps.MachineLearning):
         self.update_info['loops_learned'] += 1
 
     def update_mps_once(self): # cost function不是直接的NLL函数，前面还有个ln(Z')/ln(Z)，看原文就知道了
+        # 整个代码唯一没弄清楚的就是为什么在这里的grad要归一化， 原文伪代码倒是有这么一个p，但这里和原文中p好像不太一样?
         # Calculate gradient
         tmp_index1 = self.tensor_info['regular_center']
         tmp_tensor_current = self.tensor_data[tmp_index1]
@@ -130,14 +131,10 @@ class GTNC(convert2mps.MachineLearning):
         self.update_info['is_converged'] = bool(
             ((cost_function_loops[loops_learned - 1] - cost_function_loops[loops_learned]) /
              abs(cost_function_loops[loops_learned - 1])) < self.para['converge_accuracy'])
+        if self.update_info['is_converged']:
+            if self.update_info['step'] > self.para['step_accuracy']:
+                self.update_info['step'] /= self.para['step_decay_rate']
+                print('update step reduces to ' + str(self.update_info['step']))
+                self.update_info['is_converged'] = False
 
-    # 调整学习率
-    def learning_rate(self):
-        self.update_info['step'] = self.para['update_step']
-        if 50 <= self.update_info['cost_function']:
-            self.update_info['step'] /= self.para['step_decay_rate']
-        elif 30 <= self.update_info['cost_function']:
-            self.update_info['step'] /= self.para['step_decay_rate']**2
-        elif 10 <= self.update_info['cost_function']:
-            self.update_info['step'] /= self.para['step_decay_rate']**3
 

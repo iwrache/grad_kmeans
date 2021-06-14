@@ -25,10 +25,7 @@ class MachineLearning(MPSclass.MPS):
         self.data_info = dict()
         self.tmp = {}
         self.environment_zoom = tuple()
-
-
         self.device = BasicFunction.get_best_gpu(device=device)
-
         self.dtype = dtype
         self.tensor_data = tensor_data
         self.tensor_info = dict()
@@ -47,9 +44,9 @@ class MachineLearning(MPSclass.MPS):
         self.generate_update_info()
         # self.tensor_input = self.feature_map(self.images_data['dealt_input'])   # 6w*784*2, :,:,0是sin，:,:,1是cos
         self.environment_left = list(range(self.data_info['n_feature']))  # 784
-        
+
         self.environment_right = list(range(self.data_info['n_feature']))
-        
+
         self.environment_zoom = dict()
         self.initialize_environment()
         #if self.update_info['loops_learned'] != 0:
@@ -65,8 +62,6 @@ class MachineLearning(MPSclass.MPS):
         self.update_info['update_direction'] = 1
         self.update_info['loops_learned'] = 0
         self.update_info['cost_function_loops'] = list()
-        self.update_info['cost_time_cpu'] = list()
-        self.update_info['cost_time_wall'] = list()
         self.update_info['step'] = self.para['update_step']
         self.update_info['is_converged'] = 'untrained'
         #self.update_info['update_mode'] = self.para['update_mode']
@@ -86,8 +81,10 @@ class MachineLearning(MPSclass.MPS):
 
         ii = 0
         self.environment_left[ii] = tc.ones(self.data_info['n_training'], device=self.device, dtype=self.dtype).unsqueeze(-1)
+        # self.environment_left_backoff[ii] = tc.ones(self.data_info['n_training'], device=self.device, dtype=self.dtype).unsqueeze(-1)
         ii = self.data_info['n_feature'] - 1
         self.environment_right[ii] = tc.ones(self.data_info['n_training'], device=self.device, dtype=self.dtype).unsqueeze(-1)
+        # self.environment_right_backoff[ii] = tc.ones(self.data_info['n_training'], device=self.device,dtype=self.dtype).unsqueeze(-1)
         # for ii in range(self.tensor_info['n_length'] - 1):
         #     self.calculate_environment_next(ii + 1)
         for ii in range(self.data_info['n_feature'] - 1, 0, -1):
